@@ -1,16 +1,24 @@
-node_modules
-.DS_Store
-Thumbs.db
+# Logs
+logs
 *.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
 
-/dist
-/temp
+node_modules
+dist
+dist-ssr
+*.local
 
-# ignore everything in 'app' folder what had been generated from 'src' folder
-/app/app.js
-/app/background.js
-/app/bridge.js
-/app/**/*.map
-
-# Dictionary files are downloaded by the user's machine
-/resources/dictionaries/**/*
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
