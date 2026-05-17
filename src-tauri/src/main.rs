@@ -99,7 +99,7 @@ fn main() {
         .plugin(tauri_plugin_global_shortcut::Builder::new().with_handler(move |app, _shortcut, event| {
             if event.state == ShortcutState::Pressed {
                 let state = app.state::<AppState>();
-                let active = state.active_service.lock().unwrap().clone();
+                let active = state.active_service.lock().map(|s| s.clone()).unwrap_or_else(|_| "messages".to_string());
                 if let Some(main_window) = app.get_webview_window("main") {
                     if let Some(webview) = main_window.get_webview_window(&format!("{}_webview", active)) {
                         let _ = webview.emit("start_stt", ());
