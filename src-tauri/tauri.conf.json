@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "Unifikátor",
+  "productName": "Unifik\u00e1tor",
   "version": "0.1.0",
   "identifier": "com.milhy.unifikator",
   "build": {
@@ -11,7 +11,7 @@
     "withGlobalTauri": true,
     "windows": [
       {
-        "title": "Unifikátor",
+        "title": "Unifik\u00e1tor",
         "width": 1100,
         "height": 800,
         "minWidth": 800,
@@ -23,11 +23,17 @@
     ],
     "security": {
       "csp": null
+    },
+    "trayIcon": {
+      "iconPath": "icons/icon.png",
+      "tooltip": "Unifik\u00e1tor"
     }
   },
   "bundle": {
     "active": true,
-    "targets": ["appimage"],
+    "targets": [
+      "appimage"
+    ],
     "icon": [
       "icons/32x32.png",
       "icons/128x128.png",
