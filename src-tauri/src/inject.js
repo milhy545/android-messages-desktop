@@ -67,7 +67,7 @@ document.addEventListener('DOMContentLoaded', () => {
             inputField.dispatchEvent(new Event('input', { bubbles: true }));
           }
           setTimeout(() => {
-            const enterEvent = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, keyCode: 13, key: 'Enter' });
+            const enterEvent = new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter' });
             inputField.dispatchEvent(enterEvent);
           }, 100);
         }
