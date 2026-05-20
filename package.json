@@ -4,7 +4,10 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "check:local": "scripts/check-local.sh",
+    "check:bundle": "scripts/check-local.sh --bundle-appimage",
+    "dev:env": "scripts/dev-env.sh"
   },
   "devDependencies": {
     "@tauri-apps/api": "^2.11.0",
