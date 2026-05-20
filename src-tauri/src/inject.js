@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
     observer.observe(document.body, { childList: true, subtree: true });
   };
-  setTimeout(observeChatMutations, 3000);
+  observeChatMutations();
 
   window.__TAURI_INTERNALS__.listen('start_stt', (event) => {
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
