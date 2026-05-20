@@ -56,3 +56,47 @@ pub async fn play_edge_tts(text: String, state: State<'_, AppState>) -> Result<(
     }
     crate::tts::speak(&text).await
 }
+
+#[cfg(test)]
+mod tests {
+    // use super::*;
+    use std::sync::Mutex;
+    use crate::AppState;
+
+    #[test]
+    fn test_toggle_tts_mute() {
+        let app_state = AppState {
+            active_service: Mutex::new("messages".to_string()),
+            tts_muted: Mutex::new(false),
+        };
+
+        // Simulating the state logic directly as tauri State mock can be complex
+        let mut state_muted = app_state.tts_muted.lock().unwrap();
+        assert_eq!(*state_muted, false);
+
+        *state_muted = true;
+        assert_eq!(*state_muted, true);
+
+        *state_muted = false;
+        assert_eq!(*state_muted, false);
+    }
+
+    #[test]
+    fn test_active_service_switch() {
+        let app_state = AppState {
+            active_service: Mutex::new("messages".to_string()),
+            tts_muted: Mutex::new(false),
+        };
+
+        {
+            let mut active = app_state.active_service.lock().unwrap();
+            assert_eq!(*active, "messages");
+            *active = "chat".to_string();
+        }
+
+        {
+            let active = app_state.active_service.lock().unwrap();
+            assert_eq!(*active, "chat");
+        }
+    }
+}

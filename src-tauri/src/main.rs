@@ -7,6 +7,8 @@ mod tts;
 use std::sync::Mutex;
 use tauri::{Manager, WebviewUrl, WebviewWindowBuilder, Emitter};
 use tauri_plugin_global_shortcut::{GlobalShortcutExt, Shortcut, ShortcutState};
+use tauri::menu::{Menu, MenuItem};
+use tauri::tray::TrayIconBuilder;
 
 pub struct AppState {
     pub active_service: Mutex<String>,
@@ -176,6 +178,27 @@ fn main() {
 
             let ctrl_space = "ctrl+space".parse::<Shortcut>().unwrap();
             app.global_shortcut().register(ctrl_space).unwrap();
+
+            // Tray Icon setup
+            let show_i = MenuItem::with_id(app, "show", "Zobrazit aplikaci", true, None::<&str>).unwrap();
+            let quit_i = MenuItem::with_id(app, "quit", "Ukončit", true, None::<&str>).unwrap();
+            let menu = Menu::with_items(app, &[&show_i, &quit_i]).unwrap();
+
+            let main_window_clone = main_window.clone();
+            let _tray = TrayIconBuilder::new()
+                .menu(&menu)
+                .show_menu_on_left_click(true)
+                .icon(app.default_window_icon().unwrap().clone())
+                .on_menu_event(move |_app, event| match event.id.as_ref() {
+                    "quit" => {
+                        std::process::exit(0);
+                    }
+                    "show" => {
+                        main_window_clone.show().unwrap();
+                    }
+                    _ => {}
+                })
+                .build(app)?;
 
             Ok(())
         })
