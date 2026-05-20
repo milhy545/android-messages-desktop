@@ -1,9 +1,10 @@
 pub fn build_ssml(text: &str) -> String {
-    let escaped_text = text.replace("&", "&amp;")
-                           .replace("<", "&lt;")
-                           .replace(">", "&gt;")
-                           .replace("\"", "&quot;")
-                           .replace("'", "&apos;");
+    let escaped_text = text
+        .replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace("\"", "&quot;")
+        .replace("'", "&apos;");
     format!(
         "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='cs-CZ'><voice name='cs-CZ-AntoninNeural'><prosody pitch='+0Hz' rate='0%' volume='100%'>{}</prosody></voice></speak>",
         escaped_text
@@ -13,13 +14,17 @@ pub fn build_ssml(text: &str) -> String {
 // No unused imports
 pub async fn speak(text: &str) -> Result<(), String> {
     use futures_util::{SinkExt, StreamExt};
-    use tokio_tungstenite::{connect_async, tungstenite::protocol::Message, tungstenite::Error as WsError};
     use tokio_tungstenite::tungstenite::client::IntoClientRequest;
+    use tokio_tungstenite::{
+        connect_async, tungstenite::protocol::Message, tungstenite::Error as WsError,
+    };
 
     let url = "wss://speech.platform.bing.com/consumer/speech/synthesize/readaloud/edge/v1?TrustedClientToken=6A5AA1D4EAFF4E9FB37E23D68491D6F4";
     let request = url.into_client_request().map_err(|e| e.to_string())?;
 
-    let (ws_stream, _) = connect_async(request).await.map_err(|e: WsError| e.to_string())?;
+    let (ws_stream, _) = connect_async(request)
+        .await
+        .map_err(|e: WsError| e.to_string())?;
     let (mut write, mut read) = ws_stream.split();
 
     let uuid = uuid::Uuid::new_v4().to_string().replace("-", "");
@@ -29,7 +34,10 @@ pub async fn speak(text: &str) -> Result<(), String> {
         chrono::Utc::now().format("%a %b %d %Y %H:%M:%S GMT+0000 (Coordinated Universal Time)")
     );
 
-    write.send(Message::Text(config_msg.into())).await.map_err(|e: WsError| e.to_string())?;
+    write
+        .send(Message::Text(config_msg.into()))
+        .await
+        .map_err(|e: WsError| e.to_string())?;
 
     let ssml = build_ssml(text);
 
@@ -38,7 +46,10 @@ pub async fn speak(text: &str) -> Result<(), String> {
         uuid, ssml
     );
 
-    write.send(Message::Text(ssml_msg.into())).await.map_err(|e: WsError| e.to_string())?;
+    write
+        .send(Message::Text(ssml_msg.into()))
+        .await
+        .map_err(|e: WsError| e.to_string())?;
 
     let mut audio_data = Vec::new();
 
@@ -50,12 +61,12 @@ pub async fn speak(text: &str) -> Result<(), String> {
                     let data_start = pos + 4;
                     audio_data.extend_from_slice(&bin[data_start..]);
                 }
-            },
+            }
             Message::Text(text) => {
                 if text.contains("Path: turn.end") {
                     break;
                 }
-            },
+            }
             _ => {}
         }
     }

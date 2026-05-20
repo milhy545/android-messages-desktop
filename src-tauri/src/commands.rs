@@ -1,8 +1,12 @@
-use tauri::{AppHandle, Manager, State};
 use crate::AppState;
+use tauri::{AppHandle, Manager, State};
 
 #[tauri::command]
-pub async fn switch_webview(app: AppHandle, service: String, state: State<'_, AppState>) -> Result<(), String> {
+pub async fn switch_webview(
+    app: AppHandle,
+    service: String,
+    state: State<'_, AppState>,
+) -> Result<(), String> {
     update_active_service(&service, &state);
 
     if let Some(messages) = app.get_webview_window("messages_webview") {
@@ -43,7 +47,12 @@ fn update_tts_mute(muted: bool, state: &AppState) {
 }
 
 #[tauri::command]
-pub async fn trigger_os_notification(app: AppHandle, title: String, body: String, _service: String) -> Result<(), String> {
+pub async fn trigger_os_notification(
+    app: AppHandle,
+    title: String,
+    body: String,
+    _service: String,
+) -> Result<(), String> {
     use tauri_plugin_notification::NotificationExt;
 
     app.notification()
@@ -69,7 +78,6 @@ pub async fn play_edge_tts(text: String, state: State<'_, AppState>) -> Result<(
 mod tests {
     // use super::*;
     use std::sync::Mutex;
-    use crate::AppState;
 
     #[test]
     fn test_toggle_tts_mute() {
@@ -106,9 +114,8 @@ mod tests {
             let active = app_state.active_service.lock().unwrap();
             assert_eq!(*active, "chat");
         }
+    }
     use super::*;
-    use std::sync::Mutex;
-    use crate::AppState;
 
     fn create_test_state() -> AppState {
         AppState {
