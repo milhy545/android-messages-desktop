@@ -99,9 +99,8 @@ androidMessagesWebview.addEventListener('dom-ready', () => {
 
   // Make the title centered so that it won't get weirdly covered by the traffic light on mac
   // 10px should make it look roughly centered
-  // TODO: Use more sophisticated CSS which doesn't rely on Google's obfuscated class names to do this
   if (IS_MAC) {
-    androidMessagesWebview.insertCSS('.main-nav-header .logo {text-align:center; transform: translateX(10px)}');
+    androidMessagesWebview.insertCSS('mw-main-nav mw-logo, mw-main-nav [class*="logo"], header [class*="logo"], header [aria-label*="logo" i], header [aria-label*="messages" i] {text-align:center; transform: translateX(10px)}');
   }
 });
 
