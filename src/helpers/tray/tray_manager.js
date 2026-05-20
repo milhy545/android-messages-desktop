@@ -2,7 +2,7 @@ import path from 'path';
 import { app, Tray, Menu } from 'electron';
 import { trayMenuTemplate } from '../../menu/tray_menu_template';
 import { IS_MAC, IS_LINUX, IS_WINDOWS, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT } from '../../constants';
-import settings from 'electron-settings';
+import settings from '../settings_manager';
 
 // TODO: Make this static
 export default class TrayManager {
@@ -10,11 +10,11 @@ export default class TrayManager {
     // Must declare reference to instance of Tray as a variable, not a const, or bad/weird things happen!
     this._tray = null;
     // Enable tray/menu bar icon by default except on Linux -- the system having a tray is less of a guarantee on Linux.
-    this._enabled = settings.get(SETTING_TRAY_ENABLED, (!IS_LINUX));
+    this._enabled = settings.get(SETTING_TRAY_ENABLED);
     this._iconPath = this.setTrayIconPath();
     this._overlayIconPath = this.setOverlayIconPath();
     this._overlayVisible = false;
-    this._clickShortcut = settings.get(SETTING_TRAY_CLICK_SHORTCUT, 'double-click');
+    this._clickShortcut = settings.get(SETTING_TRAY_CLICK_SHORTCUT);
 
     this.handleTrayEnabledToggle = this.handleTrayEnabledToggle.bind(this);
     this.handleTrayClickShortcutToggle = this.handleTrayClickShortcutToggle.bind(this);
@@ -120,7 +120,7 @@ export default class TrayManager {
 
   showMinimizeToTrayWarning() {
     if (IS_WINDOWS && this.enabled) {
-      const seenMinimizeToTrayWarning = settings.get('seenMinimizeToTrayWarningPref', false);
+      const seenMinimizeToTrayWarning = settings.get('seenMinimizeToTrayWarningPref');
       if (!seenMinimizeToTrayWarning) {
         this.tray.displayBalloon({
           title: 'Android Messages',

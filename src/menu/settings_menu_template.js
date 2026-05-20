@@ -1,5 +1,5 @@
 import { dialog } from 'electron';
-import settings from "electron-settings";
+import settings from '../helpers/settings_manager';
 import { separator } from './items/separator';
 import { IS_LINUX, IS_MAC, IS_WINDOWS, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT } from '../constants';
 

@@ -14,7 +14,7 @@ import { helpMenuTemplate } from './menu/help_menu_template';
 import createWindow from './helpers/window';
 import DictionaryManager from './helpers/dictionary_manager';
 import TrayManager from './helpers/tray/tray_manager';
-import settings from 'electron-settings';
+import settings from './helpers/settings_manager';
 import { IS_MAC, IS_WINDOWS, IS_LINUX, IS_DEV, SETTING_TRAY_ENABLED, SETTING_TRAY_CLICK_SHORTCUT, SETTING_CUSTOM_WORDS, EVENT_WEBVIEW_NOTIFICATION, EVENT_NOTIFICATION_REFLECT_READY, EVENT_BRIDGE_INIT, EVENT_SPELL_ADD_CUSTOM_WORD, EVENT_SPELLING_REFLECT_READY, EVENT_UPDATE_USER_SETTING } from './constants';
 
 // Special module holding environment variables which you declared
@@ -76,13 +76,12 @@ if (!isFirstInstance) {
   app.on('ready', () => {
     trayManager = new TrayManager();
 
-    // TODO: Create a preference manager which handles all of these
-    const autoHideMenuBar = settings.get('autoHideMenuPref', false);
-    const startInTray = settings.get('startInTrayPref', false);
-    const notificationSoundEnabled = settings.get('notificationSoundEnabledPref', true);
-    const pressEnterToSendEnabled = settings.get('pressEnterToSendPref', true);
-    const hideNotificationContent = settings.get('hideNotificationContentPref', false);
-    const useSystemDarkMode = settings.get('useSystemDarkModePref', true);
+    const autoHideMenuBar = settings.get('autoHideMenuPref');
+    const startInTray = settings.get('startInTrayPref');
+    const notificationSoundEnabled = settings.get('notificationSoundEnabledPref');
+    const pressEnterToSendEnabled = settings.get('pressEnterToSendPref');
+    const hideNotificationContent = settings.get('hideNotificationContentPref');
+    const useSystemDarkMode = settings.get('useSystemDarkModePref');
     settings.watch(SETTING_TRAY_ENABLED, trayManager.handleTrayEnabledToggle);
     settings.watch(SETTING_TRAY_CLICK_SHORTCUT, trayManager.handleTrayClickShortcutToggle);
     settings.watch('notificationSoundEnabledPref', (newValue) => {
@@ -271,7 +270,7 @@ if (!isFirstInstance) {
           // We send an event with the language key and array of custom words to the webview bridge which contains the
           // instance of the spellchecker. Done this way because passing class instances (i.e. of the spellchecker)
           // between electron processes is hacky at best and impossible at worst.
-          const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
+          const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS);
 
           customWords = {};
           if (currentLanguage in existingCustomWords) {
@@ -295,7 +294,7 @@ if (!isFirstInstance) {
       // the instance of Hunspell on each launch of the app/loading of the dictionary.
       const { newCustomWord } = msg;
       const currentLanguage = app.getLocale();
-      const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS, {});
+      const existingCustomWords = settings.get(SETTING_CUSTOM_WORDS);
       if (!(currentLanguage in existingCustomWords)) {
         existingCustomWords[currentLanguage] = [];
       }
