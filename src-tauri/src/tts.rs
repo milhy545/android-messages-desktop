@@ -1,3 +1,15 @@
+pub fn build_ssml(text: &str) -> String {
+    let escaped_text = text.replace("&", "&amp;")
+                           .replace("<", "&lt;")
+                           .replace(">", "&gt;")
+                           .replace("\"", "&quot;")
+                           .replace("'", "&apos;");
+    format!(
+        "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='cs-CZ'><voice name='cs-CZ-AntoninNeural'><prosody pitch='+0Hz' rate='0%' volume='100%'>{}</prosody></voice></speak>",
+        escaped_text
+    )
+}
+
 // No unused imports
 pub async fn speak(text: &str) -> Result<(), String> {
     use futures_util::{SinkExt, StreamExt};
@@ -19,10 +31,7 @@ pub async fn speak(text: &str) -> Result<(), String> {
 
     write.send(Message::Text(config_msg.into())).await.map_err(|e: WsError| e.to_string())?;
 
-    let ssml = format!(
-        "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='cs-CZ'><voice name='cs-CZ-AntoninNeural'><prosody pitch='+0Hz' rate='0%' volume='100%'>{}</prosody></voice></speak>",
-        text
-    );
+    let ssml = build_ssml(text);
 
     let ssml_msg = format!(
         "X-RequestId: {}\r\nContent-Type: application/ssml+xml\r\nPath: ssml\r\n\r\n{}",
@@ -62,4 +71,30 @@ pub async fn speak(text: &str) -> Result<(), String> {
     });
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_build_ssml_basic() {
+        let text = "Ahoj světe";
+        let expected = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='cs-CZ'><voice name='cs-CZ-AntoninNeural'><prosody pitch='+0Hz' rate='0%' volume='100%'>Ahoj světe</prosody></voice></speak>";
+        assert_eq!(build_ssml(text), expected);
+    }
+
+    #[test]
+    fn test_build_ssml_escaping() {
+        let text = "Mám rád Jablka & Hrušky < 3 > 2 \"Ahoj\" 'Čau'";
+        let expected = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='cs-CZ'><voice name='cs-CZ-AntoninNeural'><prosody pitch='+0Hz' rate='0%' volume='100%'>Mám rád Jablka &amp; Hrušky &lt; 3 &gt; 2 &quot;Ahoj&quot; &apos;Čau&apos;</prosody></voice></speak>";
+        assert_eq!(build_ssml(text), expected);
+    }
+
+    #[test]
+    fn test_build_ssml_empty() {
+        let text = "";
+        let expected = "<speak version='1.0' xmlns='http://www.w3.org/2001/10/synthesis' xml:lang='cs-CZ'><voice name='cs-CZ-AntoninNeural'><prosody pitch='+0Hz' rate='0%' volume='100%'></prosody></voice></speak>";
+        assert_eq!(build_ssml(text), expected);
+    }
 }
