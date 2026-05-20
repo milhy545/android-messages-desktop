@@ -80,7 +80,8 @@
     "release": "webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl",
     "build": "webpack --config=build/webpack.app.config.js --env=production && electron-builder --publish never",
     "build-all": "webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl --publish never",
-    "generate-icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i"
+    "generate-icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i",
+    "lint": "node -e \"console.log('Lint is not configured in this legacy repo.')\""
   },
   "dependencies": {
     "about-window": "1.13.0",
