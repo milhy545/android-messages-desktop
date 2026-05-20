@@ -22,11 +22,12 @@ class SettingsManager {
    * @returns {*} The setting value.
    */
   get(key, defaultValue = undefined) {
-    let fallback = defaults[key];
-    if (fallback === undefined) {
-      fallback = defaultValue;
-    }
-    return settings.get(key, fallback);
+    const fallback = key in defaults ? defaults[key] : defaultValue;
+    const shouldClone = fallback !== null && typeof fallback === 'object';
+    const safeFallback = shouldClone
+      ? (typeof structuredClone === 'function' ? structuredClone(fallback) : { ...fallback })
+      : fallback;
+    return settings.get(key, safeFallback);
   }
 
   /**
