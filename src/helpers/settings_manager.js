@@ -14,7 +14,7 @@ const defaults = {
   [SETTING_CUSTOM_WORDS]: {}
 };
 
-const cloneMutableFallback = (value) => {
+const deepCloneFallback = (value) => {
   if (value === null || typeof value !== 'object') {
     return value;
   }
@@ -23,7 +23,14 @@ const cloneMutableFallback = (value) => {
     return structuredClone(value);
   }
 
-  return Array.isArray(value) ? [...value] : { ...value };
+  if (Array.isArray(value)) {
+    return value.map((item) => deepCloneFallback(item));
+  }
+
+  return Object.keys(value).reduce((clone, key) => {
+    clone[key] = deepCloneFallback(value[key]);
+    return clone;
+  }, {});
 };
 
 class SettingsManager {
@@ -35,7 +42,7 @@ class SettingsManager {
    */
   get(key, defaultValue = undefined) {
     const fallback = key in defaults ? defaults[key] : defaultValue;
-    const safeFallback = cloneMutableFallback(fallback);
+    const safeFallback = deepCloneFallback(fallback);
     return settings.get(key, safeFallback);
   }
 
