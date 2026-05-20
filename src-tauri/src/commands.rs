@@ -3,8 +3,7 @@ use crate::AppState;
 
 #[tauri::command]
 pub async fn switch_webview(app: AppHandle, service: String, state: State<'_, AppState>) -> Result<(), String> {
-    let mut active = state.active_service.lock().unwrap();
-    *active = service.clone();
+    update_active_service(&service, &state);
 
     if let Some(messages) = app.get_webview_window("messages_webview") {
         if let Some(chat) = app.get_webview_window("chat_webview") {
@@ -27,11 +26,20 @@ pub async fn switch_webview(app: AppHandle, service: String, state: State<'_, Ap
     Ok(())
 }
 
+fn update_active_service(service: &str, state: &AppState) {
+    let mut active = state.active_service.lock().unwrap();
+    *active = service.to_string();
+}
+
 #[tauri::command]
 pub async fn toggle_tts_mute(muted: bool, state: State<'_, AppState>) -> Result<(), String> {
+    update_tts_mute(muted, &state);
+    Ok(())
+}
+
+fn update_tts_mute(muted: bool, state: &AppState) {
     let mut state_muted = state.tts_muted.lock().unwrap();
     *state_muted = muted;
-    Ok(())
 }
 
 #[tauri::command]
@@ -98,5 +106,41 @@ mod tests {
             let active = app_state.active_service.lock().unwrap();
             assert_eq!(*active, "chat");
         }
+    use super::*;
+    use std::sync::Mutex;
+    use crate::AppState;
+
+    fn create_test_state() -> AppState {
+        AppState {
+            active_service: Mutex::new("messages".to_string()),
+            tts_muted: Mutex::new(false),
+        }
+    }
+
+    #[test]
+    fn test_update_tts_mute_enables_mute() {
+        let state = create_test_state();
+        assert_eq!(*state.tts_muted.lock().unwrap(), false);
+
+        update_tts_mute(true, &state);
+        assert_eq!(*state.tts_muted.lock().unwrap(), true);
+    }
+
+    #[test]
+    fn test_update_tts_mute_disables_mute() {
+        let state = create_test_state();
+        update_tts_mute(true, &state); // mute first
+
+        update_tts_mute(false, &state);
+        assert_eq!(*state.tts_muted.lock().unwrap(), false);
+    }
+
+    #[test]
+    fn test_update_active_service_switches_service() {
+        let state = create_test_state();
+        assert_eq!(*state.active_service.lock().unwrap(), "messages");
+
+        update_active_service("chat", &state);
+        assert_eq!(*state.active_service.lock().unwrap(), "chat");
     }
 }
