@@ -4,7 +4,7 @@
   "description": "Messages for web, as a desktop app",
   "version": "3.1.0",
   "author": "Chris Knepper <chris82thekid@gmail.com>",
-  "copyright": "© 2018-2019 Chris Knepper",
+  "copyright": "\u00a9 2018-2019 Chris Knepper",
   "homepage": "https://github.com/chrisknepper/android-messages-desktop",
   "repository": {
     "type": "git",
@@ -81,7 +81,7 @@
     "build": "webpack --config=build/webpack.app.config.js --env=production && electron-builder --publish never",
     "build-all": "webpack --config=build/webpack.app.config.js --env=production && electron-builder -mwl --publish never",
     "generate-icons": "png2icons assets/android_messages_desktop_icon.png resources/icon -all -i",
-    "lint": "find src -name '*.js' -print0 | xargs -0 -n1 node --check"
+    "lint": "node -e \"const {execSync}=require('child_process'); const files=execSync('git ls-files \\\"src/**/*.js\\\"',{encoding:'utf8'}).trim().split(/\\n+/).filter(Boolean); files.forEach((f)=>execSync('node --check \\\"'+f+'\\\"',{stdio:'inherit'}));\""
   },
   "dependencies": {
     "about-window": "1.13.0",
